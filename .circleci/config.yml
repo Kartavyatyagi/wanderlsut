@@ -27,7 +27,7 @@ jobs:
             sonar-scanner \
               -Dsonar.projectKey=wanderlust \
               -Dsonar.projectName=wanderlust \
-              -Dsonar.host.url=$SONAR_HOST_URL \
+              -Dsonar.host.url=$abc \
               -Dsonar.login=$SONAR_TOKEN
 
   build:
