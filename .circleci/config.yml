@@ -1,0 +1,73 @@
+version: 2.1
+
+jobs:
+  sonar-quality-check:
+    docker:
+      - image: cimg/openjdk:17.0  # or use your project-specific image
+    environment:
+      SONAR_SCANNER_VERSION: "4.7.0.2747"
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install SonarScanner
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y wget unzip
+            wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip
+            unzip sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip
+            mv sonar-scanner-${SONAR_SCANNER_VERSION}-linux sonar-scanner
+            echo 'export PATH=$PATH:$PWD/sonar-scanner/bin' >> $BASH_ENV
+            source $BASH_ENV
+
+      - run:
+          name: Run SonarQube Analysis
+          command: |
+            sonar-scanner \
+              -Dsonar.projectKey=wanderlust \
+              -Dsonar.projectName=wanderlust \
+              -Dsonar.host.url=$SONAR_HOST_URL \
+              -Dsonar.login=$SONAR_TOKEN
+
+  build:
+    docker:
+      - image: cimg/openjdk:17.0
+    steps:
+      - checkout
+      - run:
+          name: Build
+          command: echo "aaja"
+
+  test:
+    docker:
+      - image: cimg/openjdk:17.0
+    steps:
+      - checkout
+      - run:
+          name: Test
+          command: echo "aaja"
+
+  deploy:
+    docker:
+      - image: cimg/openjdk:17.0
+    steps:
+      - checkout
+      - run:
+          name: Deploy
+          command: echo "aaja"
+
+workflows:
+  version: 2
+  quality-check-and-build:
+    jobs:
+      - sonar-quality-check
+      - build:
+          requires:
+            - sonar-quality-check
+      - test:
+          requires:
+            - build
+      - deploy:
+          requires:
+            - test
